@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
+import Error from "../Components/Error";
+import { obtenerDiferenciaYear, calcularMarca ,calcularPlan } from "../Helper";
 
 const Campo = styled.div`
   display: flex;
@@ -41,67 +43,63 @@ const Button = styled.button`
   }
 `;
 
-const Error = styled.div`
- background-color:red;
- color:#fff;
- margin-bottom:2rem;
- width:100%;
- text-align:center;
- padding:1rem;
-`
-
-const Formulario = () => {
+const Formulario = ({setResumen}) => {
   const [datos, setDatos] = useState({
-    marca: '',
-    year: '',
-    plan: '',
+    marca: "",
+    year: "",
+    plan: "",
   });
 
-  const[error,setError] = useState(false)
-
+  const [error, setError] = useState(false);
 
   const { marca, year, plan } = datos;
 
-  //Obtener información 
-  const ObtenerInformacion  =  e => {
-      setDatos({
-          ...datos,
-          [e.target.name]:e.target.value
-      })
-  }
+  //Obtener información
+  const ObtenerInformacion = (e) => {
+    setDatos({
+      ...datos,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  const obtenerFormulario = e=>{
-        e.preventDefault();
-        if(marca.trim()===''||year.trim()===''||plan.trim()===''){
-            return setError(true)
-            
-        }
-        setError(false) 
-  }
+  const obtenerFormulario = (e) => {
+    e.preventDefault();
+    if (marca.trim() === "" || year.trim() === "" || plan.trim() === "") {
+      return setError(true);
+    }
+    setError(false);
+    //Obtneer diferencia de años
+    let resultado = 2000;
+    const diferencia = obtenerDiferenciaYear(year);
+    resultado -= (diferencia * 3 * resultado) / 100;
+    //Obtener el costo por la marca
+
+    resultado = calcularMarca(marca) * resultado;
+    let incrementoPlan = calcularPlan(plan);
+    resultado = parseFloat(incrementoPlan * resultado).toFixed(2);
+
+
+    setResumen({
+      cotizacion:resultado,
+      datos
+    })
+  };
 
   return (
-    <form
-     onSubmit={obtenerFormulario}>
-
-         {error?<Error>Todos los campos son obligatorios</Error>:null}
+    <form onSubmit={obtenerFormulario}>
+      {error ? <Error mensaje="Todos los campos son obligatorios" /> : null}
       <Campo>
         <Label>Marca</Label>
-        <Select 
-        name="marca" 
-        value={marca}
-        onChange={ObtenerInformacion}>
-          <option vale="">-- Seleccione --</option>
-          <option vale="americano">Americano</option>
-          <option vale="europe">Europeo</option>
-          <option vale="asiatico">Asiatico</option>
+        <Select name="marca" value={marca} onChange={ObtenerInformacion}>
+          <option value="">-- Seleccione --</option>
+          <option value="americano">Americano</option>
+          <option value="europeo">Europeo</option>
+          <option value="asiatico">Asiatico</option>
         </Select>
       </Campo>
       <Campo>
         <Label>Año</Label>
-        <Select 
-        name="year" 
-        value={year}
-        onChange={ObtenerInformacion}>
+        <Select name="year" value={year} onChange={ObtenerInformacion}>
           <option value="">-- Seleccione --</option>
           <option value="2021">2021</option>
           <option value="2020">2020</option>
@@ -117,19 +115,20 @@ const Formulario = () => {
       </Campo>
       <Campo>
         <Label>Plan</Label>
-        <InputRadio 
-        type="radio" 
-        name="plan" 
-        value="basico" 
-        checked={plan==="basico"}
-        onChange={ObtenerInformacion}/>
+        <InputRadio
+          type="radio"
+          name="plan"
+          value="basico"
+          checked={plan === "basico"}
+          onChange={ObtenerInformacion}
+        />
         Basico
-        <InputRadio 
-        type="radio" 
-        name="plan" 
-        value="completo" 
-        checked={plan==="completo"}
-        onChange={ObtenerInformacion}
+        <InputRadio
+          type="radio"
+          name="plan"
+          value="completo"
+          checked={plan === "completo"}
+          onChange={ObtenerInformacion}
         />
         Completo
       </Campo>
