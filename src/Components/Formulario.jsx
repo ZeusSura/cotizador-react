@@ -78,7 +78,6 @@ const Formulario = ({setResumen}) => {
     let incrementoPlan = calcularPlan(plan);
     resultado = parseFloat(incrementoPlan * resultado).toFixed(2);
 
-
     setResumen({
       cotizacion:resultado,
       datos
